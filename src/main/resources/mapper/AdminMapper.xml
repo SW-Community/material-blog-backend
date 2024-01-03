@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hxl.forum.mapper.AdminMapper">
+    <insert id="insert">
+        insert into admin(adminName, password, salt) values (#{adminName},#{password},#{salt})
+    </insert>
+    <update id="updatePasswordByAid">
+        UPDATE admin SET password = #{password} WHERE aid = #{aid} and isDelete=0
+    </update>
+    <update id="delete">
+        update admin set isDelete=1 where aid=#{aid}
+    </update>
+    <update id="recover">
+
+    </update>
+    <update id="recoverAll">
+        update admin set isDelete=0 where isDelete=1;
+    </update>
+    <delete id="clear">
+        delete from admin where aid=#{aid}
+    </delete>
+    <delete id="clearAll">
+        delete from admin where isDelete=1
+    </delete>
+    <select id="findByAdminName" resultType="com.hxl.forum.entity.Admin">
+        SELECT * FROM admin WHERE adminName = #{adminname} and isDelete=0
+    </select>
+    <select id="findByAid" resultType="com.hxl.forum.entity.Admin">
+        SELECT * FROM admin WHERE aid = #{aid} and isDelete=0
+    </select>
+    <select id="getAll" resultType="com.hxl.forum.entity.Admin">
+        select * from admin where isDelete=0;
+    </select>
+    <select id="getAllDeleted" resultType="com.hxl.forum.entity.Admin">
+        select * from admin where isDelete=1
+    </select>
+    <select id="getByAid" resultType="com.hxl.forum.entity.Admin">
+        select * from admin where aid=#{aid}
+    </select>
+
+
+</mapper>

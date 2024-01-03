@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hxl.forum.mapper.MainPostMapper">
+    <insert id="insert">
+        INSERT INTO mainPost(topicID, userID, mpostTitle, mpostIP, mpostContent)
+        VALUES (#{topicID}, #{userID}, #{mpostTitle}, #{mpostIP}, #{mpostContent})
+    </insert>
+    <update id="addLike">
+        UPDATE mainPost SET likeNum = likeNum + 1 WHERE mpostID = #{mid}
+    </update>
+
+    <!--  todo:实现日志功能  -->
+
+    <update id="update">
+        UPDATE mainPost SET mpostTitle = #{mpostTitle}, mpostContent = #{mpostContent}
+        WHERE mpostID = #{mpostID}
+    </update>
+
+
+    <delete id="delete">
+        update mainPost set isDelete=1 WHERE mpostID = #{mpostID}
+    </delete>
+    <select id="findByUid" resultType="com.hxl.forum.entity.MainPost">
+        SELECT * FROM mainPost WHERE mainPost.userID = #{uid} and  mainpost.isDelete=0 ORDER BY lastFoTime DESC
+    </select>
+    <select id="findByTid" resultType="com.hxl.forum.entity.MainPost">
+        SELECT * FROM mainPost WHERE topicID = #{tid} and isDelete=0 ORDER BY lastFoTime DESC
+    </select>
+    <select id="findByDay" resultType="com.hxl.forum.entity.MainPost">
+        SELECT * FROM mainpost WHERE DATE (mpostTime)= #{day}
+                                 AND topicID = #{tid} and isDelete=0
+                               ORDER BY lastFoTime DESC
+    </select>
+    <select id="findByTitle" resultType="com.hxl.forum.entity.MainPost">
+        SELECT * FROM mainpost WHERE mpostTitle LIKE CONCAT('%', #{title}, '%') AND topicID = #{tid} and isDelete=0;
+    </select>
+    <select id="findByMid" resultType="com.hxl.forum.entity.MainPost">
+
+        SELECT
+            mainpost.mpostID,mainpost.topicID,mainpost.userID,
+            mainpost.mpostTitle,mainpost.mpostTime,mainpost.lastFoTime,
+            mainpost.likeNum,mainpost.mpostIP,mainpost.mpostContent,
+            users.userName,users.profile,mainpost.floorNum
+
+        FROM mainPost,users WHERE mainpost.userID=users.userID and mpostID = #{mid} and mainpost.isDelete=0;
+    </select>
+    <select id="findLast" resultType="java.lang.String">
+        SELECT mpostID FROM mainPost where isDelete=0 order by mpostID DESC LIMIT 1
+    </select>
+    <select id="findAll" resultType="com.hxl.forum.entity.MainPost">
+        SELECT * FROM mainPost where isDelete=0
+    </select>
+
+    <select id="findAllPreview" resultType="com.hxl.forum.vo.MainPostPreviewVO">
+        select mainpost.mpostID, users.userName,mainpost.floorNum,mainpost.mpostTitle,topic.topicName,mainpost.mpostTime,mainpost.lastFoTime,mainpost.likeNum
+        from users,mainpost,topic
+        where users.userID=mainpost.userID
+        and mainpost.topicID=topic.topicID
+        and mainpost.isDelete=0
+    </select>
+
+    <select id="findVOByDay" resultType="com.hxl.forum.vo.MainPostPreviewVO">
+        select mainpost.mpostID, mainpost.floorNum,users.userName,mainpost.mpostTitle,topic.topicName,mainpost.mpostTime,mainpost.lastFoTime,mainpost.likeNum
+        from users,mainpost,topic
+        where users.userID=mainpost.userID
+          and mainpost.topicID=topic.topicID
+        and DATE(mpostTime) = #{day}
+        and mainpost.topicID=#{tid}
+        and mainpost.isDelete=0
+    </select>
+    <select id="getFloorNum" resultType="java.lang.Integer">
+        select floorNum from mainpost where mpostID=#{mid}
+    </select>
+
+    <update id="updateFloorNum">
+        update mainpost set floorNum=#{floorNum} where mpostID=#{mid}
+    </update>
+    <update id="updateDate">
+        update mainpost set lastFoTime=#{date} where mpostID=#{mid}
+    </update>
+    <select id="getMainPostCount" resultType="java.lang.Integer">
+        select count(*) from mainpost where isDelete=0
+    </select>
+    <select id="getMainPostByPage" resultType="com.hxl.forum.vo.MainPostPreviewVO">
+        select mainpost.mpostID, users.userName,mainpost.floorNum,mainpost.mpostTitle,topic.topicName,mainpost.mpostTime,mainpost.lastFoTime,mainpost.likeNum
+        from users,mainpost,topic
+        where users.userID=mainpost.userID
+          and mainpost.topicID=topic.topicID
+          and mainpost.isDelete=0
+        limit #{start},#{end}
+    </select>
+</mapper>

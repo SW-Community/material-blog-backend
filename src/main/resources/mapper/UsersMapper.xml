@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hxl.forum.mapper.UsersMapper">
+    <insert id="insert" parameterType="com.hxl.forum.entity.Users">
+        INSERT INTO users(userName, password, salt, email, gender, profile)
+        VALUES (#{userName}, #{password}, #{salt}, #{email}, #{gender}, #{profile})
+    </insert>
+    <update id="delete">
+        update users set isDelete=1 where userID=#{uid}
+    </update>
+    <update id="recover">
+        update users set isDelete=0 where userID=#{uid}
+    </update>
+    <select id="getAllDeleted" resultType="com.hxl.forum.entity.Users">
+        select * from users where isDelete=1
+    </select>
+    <update id="recoverAll">
+        update users set isDelete=0 where isDelete=1
+    </update>
+    <delete id="clear">
+        delete from users where userID=#{uid} and isDelete=1
+    </delete>
+    <delete id="clearAll">
+        delete from users where isDelete=1;
+    </delete>
+    <select id="findByUsername" parameterType="string" resultType="com.hxl.forum.entity.Users">
+        SELECT * FROM users WHERE users.userName = #{username} and  isDelete=0
+    </select>
+    <update id="updatePasswordByUid">
+        UPDATE users
+        SET password = #{password} WHERE userID = #{userID}
+    </update>
+    <select id="findByUid" resultType="com.hxl.forum.entity.Users">
+        SELECT * FROM users WHERE userID = #{uid};
+    </select>
+    <select id="getAll" resultType="com.hxl.forum.entity.Users">
+        SELECT * FROM users where isDelete=0;
+    </select>
+
+
+    <update id="updateInfoByUid">
+        UPDATE users
+        SET userName=#{username}, email = #{email}, gender = #{gender} WHERE userID = #{userID}
+    </update>
+    <update id="updateAvatarByUid">
+        UPDATE users
+        SET profile = #{profile} WHERE userID = #{userID}
+    </update>
+    <select id="getUserCount" resultType="java.lang.Integer">
+        select count(*) from users where isDelete=0;
+    </select>
+    <select id="getUsersByPage" resultType="com.hxl.forum.entity.Users">
+        select * from users where isDelete=0 limit #{start},#{end}
+    </select>
+
+</mapper>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hxl.forum.mapper.FoPostMapper">
+    <insert id="insert">
+        INSERT INTO foPost(mpostID, userID, fpostIP, fpostContent, refloor,ffloor)
+        VALUES(#{mpostID}, #{userID}, #{fpostIP}, #{fpostContent}, #{refloor},#{ffloor})
+    </insert>
+    <update id="addLike">
+        UPDATE foPost SET likeNum = likeNum + 1 WHERE fpostID = #{fid}
+    </update>
+    <delete id="delete">
+        update foPost set isDelete=1 WHERE fpostID = #{fid}
+    </delete>
+    <select id="getByMid" resultType="com.hxl.forum.entity.FoPost">
+        SELECT * FROM foPost WHERE mpostID = #{mid} and isDelete=0 order by ffloor
+    </select>
+    <select id="getByFid" resultType="com.hxl.forum.entity.FoPost">
+        SELECT * FROM foPost WHERE fpostID = #{fid} and isDelete=0
+    </select>
+    <select id="findLast" resultType="java.lang.String">
+        SELECT fpostID FROM foPost where isDelete=0 order by fpostID DESC LIMIT 1
+    </select>
+    <select id="getAll" resultType="com.hxl.forum.entity.FoPost">
+        SELECT * FROM foPost where isDelete=0
+    </select>
+
+<!--  todo:好像要改？  -->
+    <select id="getVoByMid" resultType="com.hxl.forum.vo.FoPostPreviewVO">
+        SELECT *
+        FROM foPost,users WHERE fopost.userID=users.userID and mpostID = #{mid} and fopost.isDelete=0
+    </select>
+
+
+    <select id="getAllByReply" resultType="com.hxl.forum.entity.FoPost">
+        select * from fopost where mpostID=#{mid} and refloor=#{refloor} and isDelete=0
+    </select>
+    <select id="getAllIDsByReply" resultType="java.lang.String">
+        select fpostID from fopost where mpostID=#{mid} and refloor=#{refloor} and isDelete=0
+    </select>
+    <select id="getAllIDsByMPost" resultType="java.lang.String">
+        select fpostID from fopost where mpostID=#{mid} and isDelete=0;
+    </select>
+    <select id="getFPCount" resultType="java.lang.Integer">
+        select count(*) from fopost where isDelete=0
+    </select>
+    <select id="getByPage" resultType="com.hxl.forum.vo.FoPostPreviewVO">
+        select
+            fopost.fpostID,
+            fopost.mpostID,
+            mainpost.mpostTitle,
+            users.userID,
+            fopost.fpostTime,
+            fopost.fpostIP,
+            users.userName,
+            users.profile,
+            fopost.ffloor,
+            fopost.refloor
+        from
+            fopost,mainpost,users
+        where fopost.mpostID=mainpost.mpostID and fopost.userID=users.userID and fopost.isDelete=0
+        limit #{start},#{end}
+    </select>
+</mapper>

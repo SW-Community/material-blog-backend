@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hxl.forum.mapper.PostImgMapper">
+<!--  被弃用的方法  -->
+    <insert id="insert">
+        INSERT INTO postImg(postID, img) VALUES (#{postID}, #{img})
+    </insert>
+    <insert id="insertImg">
+        INSERT INTO postImg(postID, img,type) VALUES (#{postID}, #{img},#{type})
+    </insert>
+
+    <delete id="delete">
+#         DELETE FROM postImg WHERE imgID = #{id}
+        update postimg set isDelete=0 where imgID=#{id}
+    </delete>
+    <select id="findByPid" resultType="com.hxl.forum.entity.PostImg">
+        SELECT * FROM postImg WHERE postID = #{pid}
+    </select>
+    <select id="findByIid" resultType="com.hxl.forum.entity.PostImg">
+        SELECT * FROM postImg WHERE imgID = #{id}
+    </select>
+    <select id="getMDCount" resultType="java.lang.Integer">
+        select count(*) from postimg where isDelete=0;
+    </select>
+    <select id="getVOByPage" resultType="com.hxl.forum.vo.PostImgPreviewVO">
+        select postimg.imgID,
+               postimg.postID,
+               postimg.img,
+               postimg.type,
+               mainpost.mpostTitle,
+               mainpost.topicID,
+               mainpost.userID,
+               topic.topicName,
+               users.userName
+        from postimg,mainpost,topic,users
+        where postimg.postID=mainpost.mpostID
+        and mainpost.userID=users.userID
+        and mainpost.topicID=topic.topicID
+        and postimg.isDelete=0
+        limit #{start},#{end}
+    </select>
+</mapper>
